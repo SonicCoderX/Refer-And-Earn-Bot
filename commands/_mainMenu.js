@@ -79,11 +79,9 @@ var inlineButtons = [
     { text: "🤝 Invite & Earn", callback_data: "/invite" }
   ],
   [
-    { text: "❓ How It Works?", callback_data: "/howitworks" },
-    { text: "🚀 Open Mini App ✅", web_app: { url: "https://your-mini-app-link.com" } }
-  ],
+    { text: "❓ How It Works?", callback_data: "/howitworks" }],
   [
-    { text: "📞 Support", url: "https://t.me/YourSupportChannel" },
+    { text: "📞 Support", callback_data: "/support" },
     { text: "📊 Bot Stats", callback_data: "/stats" }
   ]
 ];

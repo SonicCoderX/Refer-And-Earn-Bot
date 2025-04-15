@@ -1,5 +1,5 @@
-# AutoXTradesBot - chat bot
-It is repository for chat bot: [@AutoXTradesBot](https://t.me/AutoXTradesBot)
+# BBReferEarnXBot - chat bot
+It is repository for chat bot: [@BBReferEarnXBot](https://t.me/BBReferEarnXBot)
 
 ## What it is?
 This repository can be imported to [Bots.Business](https://bots.business) as a worked chat bot.

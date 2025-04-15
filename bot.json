@@ -1,6 +1,6 @@
 {
   "bb_sync_version":"1.0",
-  "name":"AutoXTradesBot",
+  "name":"BBReferEarnXBot",
   "csv_url":null,
   "git_remote":"git@github.com:SonicCoderX/Refer-And-Earn-Bot.git"
 }
