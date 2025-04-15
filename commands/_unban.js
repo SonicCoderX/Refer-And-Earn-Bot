@@ -16,12 +16,25 @@
   group: 
 CMD*/
 
-var adminId = 7303887249;
+// get admin panel values
+var values = AdminPanel.getPanelValues("PANEL");
 
-if (user.telegramid != adminId) {
-  Bot.sendMessage("You are not authorized to use this command.");
+// check if the user is an admin
+var admins = values.ADMINS;
+if (!admins || !admins.split(",").map(e => e.trim()).includes(user.telegramid.toString())) {
+  Api.sendMessage({
+    text: "🚫 You are not authorized to do this.\n\n Only admins can do this and you are not an admin"
+  });
   return;
 }
 
-Bot.sendMessage("Please provide the User ID to unban.");
-Bot.runCommand("/unbanUser");
+if (!params) {
+    return Bot.sendMessage('To block a user, please send "`/unban [user_id]`"\n\n*Example:*\n`/unban 124643754`');
+  }
+  
+  if (!/^\d+$/.test(params)) {
+    return Bot.sendMessage('❌ Invalid user ID. Please provide a valid numeric user ID without spaces or emojis.');
+  }
+  
+  Bot.setProp(params, null);
+  Bot.sendMessage("✅ User unblocked: " + params, { is_reply: true });

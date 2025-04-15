@@ -1,165 +1,84 @@
-# Refer & Earn Telegram Bot
+# BBReferEarnXBot - chat bot
+It is repository for chat bot: [@BBReferEarnXBot](https://t.me/BBReferEarnXBot)
 
-A powerful Refer & Earn Telegram Bot built for the Bots.Business REB Contest.  
-Includes a robust referral system, balance tracking, withdrawal flow, multi-language support, leaderboard, and a feature-rich admin panel.
+## What it is?
+This repository can be imported to [Bots.Business](https://bots.business) as a worked chat bot.
 
-**Repository:** [SonicCoderX/Refer-And-Earn-Bot](https://github.com/SonicCoderX/Refer-And-Earn-Bot)
+[Bots.Business](https://bots.business) - it is probably the first CBPaaS - Chat Bot Platform as a Service.
 
----
+A CBPaaS is a cloud-based platform that enables developers to create chatbots without needing to build backend infrastructure.
 
-## 🚀 Features
+## Create your own bot for Telegram from this Git repo
 
-- **Referral System**: Earn rewards by inviting friends.
-- **Balance Tracking**: Real-time user balances and earnings.
-- **Withdrawal System**: Secure, admin-configurable withdrawal flow.
-- **Leaderboard**: See top performers by referrals and earnings.
-- **Multi-Language Support**: English, Italian, Spanish, Portuguese, German, French, Russian.
-- **Admin Panel**: Manage balances, set withdrawal limits, broadcast messages, and more.
-- **Anti-Abuse**: Ban system and checks to prevent self-invites or multiple rewards.
+How to create bot?
+1. Create bot with [@BotFather](https://telegram.me/BotFather) and take Secret Token
+2. Create bot in App and add Secret Token
+3. Add Public Key from App as [Deploy key](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys) with read access (and write access for bot exporting if you need it)
+4. Do import for this git repo
 
----
+Now you can talk with yours new Telegram Bot
 
-## 🗂️ Folder Structure
+See [more](https://help.bots.business/getting-started)
 
-- `commands/` — All user and admin command handlers.
-- `commands/Admin Panel/` — Admin-only bot controls.
-- `commands/_start.js` — Main entry point for new and returning users.
-- `commands/_help.js` — Help and info.
-- `commands/_balance.js` — Balance and earnings summary.
-- `commands/_withdraw.js` — Withdrawal logic and checks.
-- `commands/_leaderboard.js` — Leaderboard display.
-- Other files for advanced flow and state management.
+## Commands - in commands folder
+File name - it is command name (Bot it can be rewritten in command description)
 
----
+Command can have: `name`, `help`, `aliases` (second names), `answer`, `keyboard`, `scnarios` (for simple logic) and other options.
 
-## ⚙️ Bot User Flow
+### Command description
+It is file header:
 
-1. **Start**  
-   User sends `/start` (handles referral tracking if joined via invite link).
-   - New users are logged and notified to admin.
-   - Referral attributions are handled, and both user and referrer are notified.
+    /*CMD
+      command: /test
+      help: this is help for ccommand
+      need_reply: [ true or false here ]
+      auto_retry_time: [ time in sec ]
+      answer: it is example answer for /test command
+      keyboard: button1, button2
+      aliases: /test2, /test3
+    CMD*/
 
-2. **Main Menu**  
-   After `/start`, users can:
-   - Check `/balance` for wallet and plan stats.
-   - View `/leaderboard` for top earners/referrers.
-   - Use `/withdraw_funds` to begin a withdrawal.
-   - Access `/help` for detailed info.
+See [more](https://help.bots.business/commands)
 
-3. **Referral & Earnings**  
-   - Each user has a unique referral link.
-   - On successful referrals, both parties may be rewarded (per admin-configured logic).
+### Command body
+It is command code in JavaScript.
+Use Bot Java Script for logic in command.
 
-4. **Withdrawals**  
-   - Start with `/withdraw_funds`.
-   - Enter amount (within min/max admin limits).
-   - Funds deducted and withdrawal request logged for processing.
-   - Withdrawal can only proceed if wallet is set, not banned, and not under maintenance.
+For example:
+> Bot.sendMessage(2+2);
 
-5. **Admin Controls** (`Admin Panel/`)
-   - `/addBalance` — Add funds to any user by Telegram ID.
-   - `/removeBalance` — Remove funds from any user.
-   - `/setMinimumWithdraw` — Set the minimum withdrawal threshold.
-   - `/setMaximumWithdraw` — Set the maximum withdrawal threshold.
-   - All admin actions are permission checked.
+See [more](https://help.bots.business/scenarios-and-bjs)
 
----
 
-## 📝 Commands
+## Libraries - in libs folder
+You can store common code in the libs folder. File name - it is library name.
 
-| Command                  | Description                                         | Accessible by |
-|--------------------------|-----------------------------------------------------|---------------|
-| `/start`                 | Start bot, handle referral, show main menu          | User          |
-| `/help`                  | Show help and project info                          | User          |
-| `/balance`               | View your balance and earnings breakdown            | User          |
-| `/leaderboard`           | See top referrers and earners                       | User          |
-| `/withdraw_funds`        | Begin withdrawal flow                               | User          |
-| `/withdraw`              | (Follow-up) Submit withdrawal amount                | User          |
-| `/addBalance`            | Add balance to a user (by ID)                       | Admin         |
-| `/removeBalance`         | Remove balance from a user (by ID)                  | Admin         |
-| `/setMinimumWithdraw`    | Set minimum withdrawal limit                        | Admin         |
-| `/setMaximumWithdraw`    | Set maximum withdrawal limit                        | Admin         |
+For example code in myLib.js:
 
-> Tip: The bot has multi-language prompts for user-facing commands.
+    function hello(){ Bot.sendMessage("Hello from lib!") }
+    function goodbye(name){ Bot.sendMessage("Goodbye, " + name) }
 
----
+    publish({
+      sayHello: hello,
+      sayGoodbyeTo: goodbye
+    })
 
-## 🌐 Multi-Language Support
+then you can run in any bot's command:
 
-All major commands and user flows support these languages:
-- English (EN)
-- Italian (IT)
-- Spanish (ES)
-- Portuguese (PT)
-- German (DE)
-- French (FR)
-- Russian (RU)
+    Libs.myLib.hello()
+    Libs.myLib.sayGoodbyeTo("Alice")
 
----
+See [more](https://help.bots.business/git/library)
 
-## 🛡️ Security & Anti-Abuse
+## Other bots example
+See other bots examples in the [github](https://github.com/bots-business?utf8=✓&tab=repositories&q=&type=public&language=javascript) or in the [Bot Store](https://bots.business/)
 
-- Users are banned if flagged by admin or bot logic.
-- Maintenance mode blocks non-admin actions.
-- Self-invites and duplicate referrals prevented.
-- Withdrawals require valid USDT (BEP20) wallet.
 
----
+## Other help
+[Help.bots.business](https://help.bots.business)
 
-## 🛠️ Setup & Deployment
+## API
+See [API](https://api.bots.business/docs#/docs/summary)
 
-1. **Clone this repository**
-   ```bash
-   git clone https://github.com/SonicCoderX/Refer-And-Earn-Bot.git
-   ```
 
-2. **Configure Bot on [Bots.Business](https://bots.business/)**  
-   - Import the JavaScript command files into your bot project.
-   - Set necessary bot properties: `admin`, withdrawal limits, etc.
-
-3. **Set Bot Properties**
-   - `admin` (Telegram ID of bot admin)
-   - `minimumWithdraw` (e.g., `1`)
-   - `maximumWithdraw` (e.g., `1000`)
-   - `maintenanceStatus` (On/Off)
-   - `Broadcast` (array of user IDs for broadcasting)
-   - Any other custom properties for your flow.
-
-4. **Launch and Test**
-   - Start your bot.
-   - Test referral, withdrawal, and admin flows.
-
----
-
-## 🏆 Example Screens
-
-- **Help Command**  
-  ![Help](https://i.ibb.co/BNSHtmr/IMG-2476.jpg)
-
----
-
-## 💡 Notes
-
-- This bot is designed for Bots.Business platform (not a standalone Node.js/JS app).
-- All logic is in JavaScript files tailored for Bots.Business scripting.
-- To see or customize all commands, check the [`commands/`](./commands) folder.
-
----
-
-## 📚 More
-
-- [Full source code and commands](https://github.com/SonicCoderX/Refer-And-Earn-Bot)
-- For more details, browse the repository on GitHub to explore all command files and logic.
-
----
-
-## 👨‍💻 Credits
-
-- Developed by [SonicCoderX](https://github.com/SonicCoderX)
-- For contest, demo, and educational use.
-
----
-
-> **Note:** This README is based on an automated analysis of up to 10 command files.  
-> For a complete list, browse the [GitHub code search results](https://github.com/SonicCoderX/Refer-And-Earn-Bot/search?q=command) or the [`commands/`](https://github.com/SonicCoderX/Refer-And-Earn-Bot/tree/main/commands) directory for all available features and flows.
-> 
+![](https://bots.business/images/web-logo.png)
