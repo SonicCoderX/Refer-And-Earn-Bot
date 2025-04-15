@@ -16,47 +16,47 @@
   group: 
 CMD*/
 
-/*CMD
-  command: /history
-  help: Show withdraw history
-  need_reply: false
-  auto_retry_time:
-  folder: Withdraw
-CMD*/
+var img = "https://t.me/Crunchyroll_Anime_in_Hindi_Dub_c/3868"
+var set = AdminPanel.getPanelValues("PANEL")
+var currency = set.CURRENCY || "TRX"
 
-let allProps = Bot.getProperties();
-let userId = user.telegramid;
+var historyList = new List({ name: "withdraw_history", user_id: user.id })
+var history = historyList.getAll()
 
-let history = [];
+let msg = "<b>📤 Withdrawal History:</b>\n\n"
 
-for (let key in allProps) {
-  if (allProps.hasOwnProperty(key)) {
-    let data = allProps[key];
-    if (typeof data === "string" && data.includes(userId)) {
-      history.push({ key: key, data: data });
-    }
-  }
+if (!history || history.length === 0) {
+  msg += "❌ No withdrawals yet."
+} else {
+  history.reverse().forEach((item, index) => {
+    msg += `▎${index + 1}. <b>Amount:</b> ${item.amount} ${currency}\n   🕒 <b>Time:</b> ${item.time}\n\n`
+  })
 }
 
-if (history.length === 0) {
-  Bot.sendMessage("📜 You don't have any withdrawal history yet.");
-  return;
+var btns = {
+  inline_keyboard: [
+    [{ text: "▷ Back", callback_data: "/start" }]
+  ]
 }
 
-// Sort by key (assuming key is timestamp-based ID)
-history.sort((a, b) => b.key - a.key);
-
-let msg = "<b>📜 Your Withdrawal History:</b>\n\n";
-
-let count = 0;
-for (let entry of history) {
-  if (count >= 10) break;
-  let parts = entry.data.split("\n");
-  let amountLine = parts.find(p => p.includes("💸 Amount:"));
-  let timeLine = parts.find(p => p.includes("🩷 Time:"));
-  
-  msg += `🆔 <code>${entry.key}</code>\n${amountLine}\n${timeLine}\n\n`;
-  count++;
+if (request.message?.message_id) {
+  Api.editMessageMedia({
+    chat_id: chat.chatid,
+    message_id: request.message.message_id,
+    media: {
+      type: "photo",
+      media: img,
+      caption: msg,
+      parse_mode: "HTML"
+    },
+    reply_markup: btns
+  })
+} else {
+  Api.sendPhoto({
+    chat_id: chat.chatid,
+    photo: img,
+    caption: msg,
+    parse_mode: "HTML",
+    reply_markup: btns
+  })
 }
-
-Api.sendMessage(msg, { parse_mode: "HTML" });
