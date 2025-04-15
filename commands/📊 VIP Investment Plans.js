@@ -12,7 +12,7 @@
   <<KEYBOARD
 
   KEYBOARD
-  aliases: /plans
+  aliases: /vipplans
   group: 
 CMD*/
 

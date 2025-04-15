@@ -85,7 +85,7 @@ if (autowithStatus === "Off" && withdrawalStatus === "On") {
   var wallet = User.getProperty("wallet");
   if (wallet === undefined) {
     var undefinedText = "<i>⚠️ Set your wallet first by clicking the button below 👇</i>";
-    var button = [[ { text: "🗂️ Set wallet", callback_data: "🗂️ Wallet" } ]];
+    var button = [[ { text: "🗂️ Set wallet", callback_data: "/setwallet" } ]];
 
     Api.sendMessage({
       text: undefinedText,
