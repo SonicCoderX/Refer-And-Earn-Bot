@@ -71,7 +71,7 @@ var inlineButtons = [
   [{ text: "💰 My Balance", callback_data: "/balance" }],
   [
     { text: "🏦 Deposit Funds", callback_data: "/deposit" },
-    { text: "🏧 Withdraw Funds", callback_data: "/withdraw" }
+    { text: "🏧 Withdraw Funds", callback_data: "/withdraw_funds" }
   ],
   [{ text: "📊 VIP Investment Plans", callback_data: "/vipplans" }],
   [
@@ -79,11 +79,7 @@ var inlineButtons = [
     { text: "🤝 Invite & Earn", callback_data: "/invite" }
   ],
   [
-    { text: "❓ How It Works?", callback_data: "/howitworks" },
-    { text: "🚀 Open Mini App ✅", web_app: { url: "https://your-mini-app-link.com" } }
-  ],
-  [
-    { text: "📞 Support", url: "https://t.me/YourSupportChannel" },
+    { text: "📞 Support", callback_data: "/support" },
     { text: "📊 Bot Stats", callback_data: "/stats" }
   ]
 ];
