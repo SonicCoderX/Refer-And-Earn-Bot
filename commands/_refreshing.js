@@ -1,5 +1,5 @@
 /*CMD
-  command: /leaderboard
+  command: /refreshing
   help: 
   need_reply: false
   auto_retry_time: 
@@ -44,7 +44,7 @@ var leaderboard = Object.entries(usersData)
   .slice(0, 10);
 
 // 🎖️ Compose Leaderboard Message
-var msg = "<b>🏆 Top Earners Leaderboard:</b>\n";
+var msg = "<b>🏆 Top Earners Leaderboard ( ⟳ )</b>\n";
 msg += "━━━━━━━━━━━━━━━━━━━━━\n";
 
 if (leaderboard.length === 0) {
@@ -74,7 +74,7 @@ msg += "━━━━━━━━━━━━━━━━━━━━━";
 // 🔘 Inline Buttons
 var keyboard = {
   inline_keyboard: [
-    [{ text: "↻ Refresh ⟳", callback_data: "/refresh" }],
+    [{ text: "⟳ Refresh", callback_data: "/refresh" }],
     [{ text: "▷ Back", callback_data: "/start" }]
   ]
 };
@@ -104,3 +104,5 @@ if (request.message) {
     reply_markup: keyboard
   });
 }
+
+Bot.runCommand("/leaderboard");

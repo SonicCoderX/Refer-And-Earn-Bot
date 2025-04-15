@@ -1,32 +1,54 @@
 /*CMD
   command: /help
   help: 
-  need_reply: 
+  need_reply: false
   auto_retry_time: 
   folder: 
 
   <<ANSWER
 
   ANSWER
-  keyboard: 
+
+  <<KEYBOARD
+
+  KEYBOARD
   aliases: 
   group: 
 CMD*/
 
-// Send the image
-Api.sendPhoto({
-  photo: "https://i.ibb.co/BNSHtmr/IMG-2476.jpg",
-  caption: "🚀 *Welcome to CEI LIMITED INVESTMENTS!* \n\n" +
-    "*Your reliable partner in the world of cryptocurrency and arbitrage!*\n\n" +
-    "💰 *Why choose us?*\n\n" +
-    "1️⃣ *Stable Income*: Earn *10% daily* on your investment amount!\n\n" +
-    "2️⃣ *Referral Program*: Recommend us and earn *10%* from your friends' Deposits & Earning!\n\n" +
-    "3️⃣ *Convenient Transactions*: Easy access to deposit and withdraw funds in cryptocurrency.\n\n" +
-    "4️⃣ *Automatic Payments*: Receive your funds on time without any hassle.\n\n" +
-    "5️⃣ *Minimum Deposit/Withdrawal of 10 TRX ~ 3USDT*: Withdraw Profits Every Hour No Conditions.\n\n" +
-    "6️⃣ *Daily Bonuses*: We value your participation and reward you with additional incentives!\n\n" +
-    "🔒 *Transparent and Trustworthy*: We charge only *15% of your profits* to ensure a sustainable system and long-term benefits for all users.\n\n" +
-    "🌟 *Join a community of like-minded individuals striving for financial independence!*\n\n" +
-    "*Register today and unlock new investment opportunities with USDT INVESTMENTS!* 💪",
-  parse_mode: "Markdown"
-});
+var panelData = AdminPanel.getPanelValues("PANEL");
+
+// Custom help message (editable from PANEL if desired)
+var helpText = panelData.SUPPORT_MESSAGE || `ℹ️ *Welcome to Your Earning Assistant!*  
+
+💼 *Earn by Sharing!*  
+Invite others and earn TRX rewards instantly.
+
+🔍 *How to Use:*  
+1️⃣ *Launch the bot* and follow the setup.  
+2️⃣ *Join the required channels.*  
+3️⃣ *Share your unique referral link.*  
+4️⃣ *Earn and withdraw TRX anytime.*`;
+
+var inlineBtns = {
+  inline_keyboard: [
+    [{ text: "✍️ Contact Support", callback_data: "/support" }],
+    [{ text: "▷ Back", callback_data: "/start" }]
+  ]
+};
+
+// Edit existing message if possible
+if (request.message?.message_id) {
+  Api.editMessageText({
+    message_id: request.message.message_id,
+    text: helpText,
+    parse_mode: "Markdown",
+    reply_markup: inlineBtns
+  });
+} else {
+  Api.sendMessage({
+    text: helpText,
+    parse_mode: "Markdown",
+    reply_markup: inlineBtns
+  });
+}
