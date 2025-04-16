@@ -16,131 +16,181 @@
   group: 
 CMD*/
 
-// Get bot settings from admin panel
-var values = AdminPanel.getPanelValues("PANEL")
-var linkPrefix = values.REFER_LINK_PREFIX || "Bot"
-// Run referral tracking at the top
-var tracks = {
-  onTouchOwnLink: function() {
-    Bot.sendMessage("*❌ Stop Clicking Your Own Referral Link!*")
-  },
-
-  onAtractedByUser: function(byUser) {
-    Api.sendMessage({
-      text: `🎁 You are invited by <a href='tg://user?id=${byUser.telegramid}'>${byUser.first_name}</a>`,
-      parse_mode: "HTML"
-    })
-    Api.sendMessage({
-      chat_id: byUser.telegramid,
-      text: `🎉 You have successfully invited <a href='tg://user?id=${user.telegramid}'>${user.first_name}</a>`,
-      parse_mode: "HTML"
-    })
-  },
-
-  onAlreadyAttracted: function() {
-    Bot.sendMessage("*🚫 You Have Already Started The Bot!*")
-  },
-
-  linkPrefix: linkPrefix
-}
-RefLib.track(tracks)
-
-// Check and get not joined chats if available
-let chats = Libs.MembershipChecker.getNotJoinedChats()
-Libs.MembershipChecker.check()
-let isMember = Libs.MembershipChecker.isMember()
-
-// If user hasn't joined all required chats
-if (!isMember) {
-  var chatArray = chats.split(",").map(function(chat) {
-    return chat.trim()
-  })
-
-  var inlineKeyboard = []
-  for (var i = 0; i < chatArray.length; i += 2) {
-    let row = []
-    if (chatArray[i]) {
-      row.push({
-        text: chatArray[i],
-        url: "https://t.me/" + chatArray[i].replace("@", "")
-      })
-    }
-    if (chatArray[i + 1]) {
-      row.push({
-        text: chatArray[i + 1],
-        url: "https://t.me/" + chatArray[i + 1].replace("@", "")
-      })
-    }
-    inlineKeyboard.push(row)
-  }
-
-  inlineKeyboard.push([{ text: "✅ Joined", callback_data: "/start" }])
-
-  var msg =
-    values.NEED_JOIN_MSG || `Please Join All Required Channels to use this Bot`
-  Api.sendMessage({
-    text: msg,
-    parse_mode: "Markdown",
-    reply_markup: { inline_keyboard: inlineKeyboard }
-  })
+// If the user has already joined, send them directly to the main menu.
+if (User.getProperty("joined") === "Yes") {
+  Bot.runCommand("/mainMenu")
   return
 }
 
-// Get inviter and reward after joining all chats, if not rewarded yet
-let inviter = RefLib.getAttractedBy()
-if (inviter && !User.getProperty("rewarded")) {
-  let referralBonus = parseFloat(values.REFER_REWARD) || 0.5
-  Libs.ResourcesLib.anotherUserRes("balance", inviter.telegramid).add(
-    referralBonus
-  )
+var newUser = User.getProperty("newUser")
+
+if (!newUser) {
+  User.setProperty("newUser", "Yes", "string")
+
+  var admin = Bot.getProperty("admin")
+  var userName = user.first_name
+  var username = "@" + user.username
+  var userID = user.telegramid
+  var userLink = "<a href='tg://user?id=" + userID + "'>" + userName + "</a>"
+  var status = Libs.ResourcesLib.anotherChatRes("status", "global")
+
+  status.add(1)
+
+  var adminText =
+    "<b>🎉 New User Alert! 🎉</b>\n\n" +
+    "👤 <b>Name:</b> " +
+    userName +
+    "\n" +
+    "📧 <b>Username:</b> " +
+    username +
+    "\n" +
+    "🔗 <b>User Link:</b> " +
+    userLink +
+    "\n" +
+    "🆔 <b>User ID:</b> <code>" +
+    userID +
+    "</code>\n\n" +
+    "📊 <b>Total Users:</b> <code>" +
+    status.value() +
+    "</code>"
+
   Api.sendMessage({
-    chat_id: inviter.telegramid,
-    text: `🎉 You have received a referral bonus of *${referralBonus} ${values.CURRENCY}* for inviting ${user.first_name}!`,
-    parse_mode: "Markdown"
+    chat_id: admin,
+    text: adminText,
+    parse_mode: "html"
   })
-  User.setProperty("rewarded", true)
 }
 
-// Start message and buttons
-let Message = `*🩵 Welcome to the Refer And Earn Bot! 🩵*
- 
-*🩷 Earn rewards by referring your friends! 🩷*
+var broadcast = Bot.getProperty("Broadcast") ? Bot.getProperty("Broadcast") : []
 
-*🌈 Invite your friends and start earning now!*`
+if (!broadcast.includes(user.telegramid)) {
+  broadcast.push(user.telegramid)
+  Bot.setProperty("Broadcast", broadcast, "json")
+}
 
-// Define the inline buttons (keeping your original layout intact)
-var buttons = {
-  inline_keyboard: [
+function doTouchOwnLink() {
+  var ownText =
+    "<i>⚠️ Oops! You can't invite yourself. Share your invite link with others to earn rewards!</i>"
+
+  Api.sendMessage({
+    text: ownText,
+    parse_mode: "html"
+  })
+}
+
+function doAttracted(refUser) {
+  var userText =
+    "<b>👋 Welcome to the community!</b>\n" +
+    "🎉 <b>You were invited by:</b> <a href='tg://user?id=" +
+    refUser.telegramid +
+    "'>" +
+    refUser.first_name +
+    "</a>"
+
+  Api.sendMessage({
+    text: userText,
+    parse_mode: "html"
+  })
+
+  var refUserText =
+    "<b>👬 New Referral!</b>\n" +
+    "🎉 <b>A new user joined through your invite link:</b> <a href='tg://user?id=" +
+    user.telegramid +
+    "'>" +
+    user.first_name +
+    "</a>"
+
+  Api.sendMessage({
+    chat_id: refUser.telegramid,
+    text: refUserText,
+    parse_mode: "html"
+  })
+}
+
+function doAlreadyAttracted() {
+  var alreadyText =
+    "<i>⚠️ You’ve already started exploring @" +
+    bot.name +
+    ". Keep going and enjoy the benefits!</i>"
+
+  Api.sendMessage({
+    text: alreadyText,
+    parse_mode: "html"
+  })
+}
+
+var trackOptions = {
+  onTouchOwnLink: doTouchOwnLink,
+  onAttracted: doAttracted,
+  onAlreadyAttracted: doAlreadyAttracted
+}
+
+Libs.ReferralLib.track(trackOptions)
+
+var channel1 = Bot.getProperty("channel1")
+var channel2 = Bot.getProperty("channel2")
+var photo = "https://ibb.co/Qjn1VvPm"
+var text =
+  "<b>🚀 Join and Start Earning!</b>\n\n" +
+  "🌟 <i>Experience hassle-free trading with our advanced AI-driven quantitative trading system.</i>\n\n" +
+  "💼 <b>How it works:</b>\n" +
+  "✔️ Automatically analyze exchange rate differences\n" +
+  "✔️ Buy low, sell high, and earn daily profits effortlessly\n\n" +
+  "📢 <b>Join Channel To unlock all features and start your journey:</b>\n"
+
+// If join channel requirement is disabled (empty), go straight to the main menu.
+if (!channel1 || channel1.trim() === "") {
+  Bot.runCommand("/mainMenu")
+  return
+}
+
+if (channel2 === undefined) {
+  var buttons = [
     [
-      { text: "💰 Balance", callback_data: "/balance" },
-      { text: "➥ Refer & Earn", callback_data: "/referral" }
+      {
+        text: "🔗 Join Channel",
+        url: "https://t.me/" + channel1
+      }
     ],
     [
-      { text: "🏆 Leaderboard", callback_data: "/leaderboard" },
-      { text: "🛍️ Withdraw", callback_data: "/withdraw" }
+      {
+        text: "✅ I've Joined",
+        callback_data: "/joined"
+      }
     ]
   ]
-}
 
-let Image = "https://t.me/Crunchyroll_Anime_in_Hindi_Dub_c/3868"
-
-if (request.message?.message_id) {
-  Api.editMessageMedia({
-    message_id: request.message.message_id,
-    media: {
-      type: "photo",
-      media: Image,
-      caption: Message,
-      parse_mode: "Markdown"
-    },
-    reply_markup: buttons
+  Api.sendPhoto({
+    photo: photo,
+    caption: text,
+    reply_markup: { inline_keyboard: buttons },
+    parse_mode: "html"
   })
 } else {
+  var buttons = [
+    [
+      {
+        text: "🔗 Join Channel 1",
+        url: "https://t.me/" + channel1
+      },
+      {
+        text: "🔗 Join Channel 2",
+        url: "https://t.me/" + channel2
+      }
+    ],
+    [
+      {
+        text: "✅ I've Joined",
+        callback_data: "/joined"
+      }
+    ]
+  ]
+
   Api.sendPhoto({
-    photo: Image,
-    caption: Message,
-    parse_mode: "Markdown",
-    reply_markup: buttons
+    photo: photo,
+    caption: text,
+    reply_markup: { inline_keyboard: buttons },
+    parse_mode: "html"
   })
 }
 
