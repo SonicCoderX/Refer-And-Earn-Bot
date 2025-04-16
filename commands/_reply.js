@@ -1,13 +1,10 @@
 /*CMD
   command: /reply
   help: 
-  need_reply: false
+  need_reply: true
   auto_retry_time: 
   folder: 
-
-  <<ANSWER
-
-  ANSWER
+  answer: *📞 Send the reply*
 
   <<KEYBOARD
 
@@ -16,41 +13,93 @@
   group: 
 CMD*/
 
-/*CMD
-  command: /reply
-  help: Store the user ID for reply
-  need_reply: false
-CMD*/
+var admin = Bot.getProperty("admin");
+var users = user.telegramid;
+var botLink = "@" + bot.name;
 
-let panel = AdminPanel.getPanelValues("PANEL");
-let adminList = panel.ADMINS;
+if (users === admin) {
+  var replyID = Bot.getProperty("replyID");
+  var replyText = message ? message : null;
+  var userText = "<b>📞 Reply from Support Executive</b>\n\n";
+  
+  // Check if admin sent a photo
+  if (request.photo && request.photo.length > 0) {
+    var photoID = request.photo[request.photo.length - 1].file_id;
+    var captionText = request.caption ? request.caption : "No message provided.";
+    userText += "<b>👉 Reply:</b> <i>" + captionText + "</i>";
 
-if (!adminList) {
-  Bot.sendMessage("❌ *Admin configuration missing!*", { parse_mode: "Markdown" });
-  return;
+    var button = [
+      [
+        {
+          text: "📞 Reply to admin",
+          callback_data: "📞 Support"
+        }
+      ]
+    ];
+
+    Api.sendPhoto({
+      chat_id: replyID,
+      photo: photoID,
+      caption: userText,
+      parse_mode: "html",
+      reply_markup: { inline_keyboard: button }
+    });
+
+    var adminText =
+      "<b>📞 Reply sent to</b> <code>" +
+      replyID +
+      "</code>\n\n<b>👉 Reply (Photo):</b> <i>" +
+      captionText +
+      "</i>";
+
+    Api.sendMessage({
+      text: adminText,
+      parse_mode: "html"
+    });
+
+  } else if (replyText) {
+    userText += "<b>👉 Reply:</b> <i>" + replyText + "</i>";
+
+    var button = [
+      [
+        {
+          text: "📞 Reply to admin",
+          callback_data: "📞 Support"
+        }
+      ]
+    ];
+
+    Api.sendMessage({
+      chat_id: replyID,
+      text: userText,
+      reply_markup: { inline_keyboard: button },
+      parse_mode: "html"
+    });
+
+    var adminText =
+      "<b>📞 Reply sent to</b> <code>" +
+      replyID +
+      "</code>\n\n<b>👉 Reply:</b> <i>" +
+      replyText +
+      "</i>";
+
+    Api.sendMessage({
+      text: adminText,
+      parse_mode: "html"
+    });
+
+  } else {
+    Api.sendMessage({
+      text: "<i>⚠️ Error: No message or photo found in your reply.</i>",
+      parse_mode: "html"
+    });
+  }
+
+} else {
+  var notAdminText = "<i>⚠️ You're not the admin of " + botLink + ".</i>";
+
+  Api.sendMessage({
+    text: notAdminText,
+    parse_mode: "html"
+  });
 }
-
-// Check if current user is in admin list
-let isAdmin = adminList.split(",").map(id => id.trim()).includes(user.telegramid.toString());
-
-if (!isAdmin) {
-  Bot.sendMessage("❌ *You are not authorized to use this command.*", { parse_mode: "Markdown" });
-  return;
-}
-
-// Get the user ID from params
-let userId = params;
-
-if (!userId || isNaN(userId)) {
-  Bot.sendMessage("❌ *Invalid user ID! Please use the format:* `/reply user_id`", { parse_mode: "Markdown" });
-  return;
-}
-
-// Store the user ID for reply
-Bot.setProperty("reply_user_id", userId, "integer");
-
-Bot.sendMessage("✅ *User ID:* `" + userId + "` *has been stored.*\n\n" +
-                "📝 *Use* `/reply2` *to enter your message.*", 
-{ parse_mode: "Markdown" });
-
-Bot.runCommand("/reply2");
